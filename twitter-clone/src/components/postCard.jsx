@@ -2,7 +2,7 @@ import './postCard.css';
 import CommentSection from './commentSection';
 import { useState } from 'react';
 
-
+// 
 function PostCard(props){
     const [likes, setLikes] = useState(0);
     const [comments, setComments] = useState([]);
