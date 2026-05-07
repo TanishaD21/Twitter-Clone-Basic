@@ -1,44 +1,56 @@
-import logo from './logo.svg';
 import './App.css';
 import { useState } from 'react';
+import {BrowserRouter, Routes, Route} from 'react-router-dom';
+
+import Navbar from './components/navbar';
+import Home from './pages/home';
+import Post from './pages/post';
 
 function App() {
-  const [count, setCount] = useState(0);
-  const[name, setName] = useState("");
-  const [todos, setTodos] = useState([
-    { id: 1, text: "Learn React" },
-    { id: 2, text: "Build a Twitter Clone" },
-    { id: 3, text: "Deploy the App" }
+  const [posts, setPosts] = useState([
+    { id: 1, username: "user1", content: "This is the first post!" },
+    { id: 2, username: "user2", content: "This is the second post!" },
+    { id: 3, username: "user3", content: "This is the third post!" }
   ]);
 
+  const handleNewPost = (text) => {
+
+    const newPost = {
+      id: Date.now(),
+      username: "You",
+      content: text
+    };
+
+    setPosts([newPost, ...posts]);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          You clicked {count} times
-        </p>
-        <button onClick={() => setCount(count + 1)}>
-          Click me
-        </button>
-        <input
-          type="text"
-          placeholder="Enter your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <p>
-          Hello, {name}!
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+
+      <div className="App">
+
+        <Navbar />
+
+        <div className="main-content">
+
+          <Routes>
+
+            <Route
+              path="/"
+              element={<Home posts={posts} />}
+            />
+
+            <Route
+              path="/post"
+              element={<Post addPost={handleNewPost} />}
+            />
+
+          </Routes>
+
+        </div>
+
+      </div>
+
+    </BrowserRouter>
   );
 }
 
