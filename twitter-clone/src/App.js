@@ -6,6 +6,7 @@ import Navbar from './components/navbar';
 import Home from './pages/home';
 import Post from './pages/post';
 
+// Main App component that sets up routing and manages posts state
 function App() {
   const [posts, setPosts] = useState([
     { id: 1, username: "user1", content: "This is the first post!" },
@@ -13,6 +14,7 @@ function App() {
     { id: 3, username: "user3", content: "This is the third post!" }
   ]);
 
+  // Function to handle adding a new post to the state
   const handleNewPost = (text) => {
 
     const newPost = {
@@ -20,9 +22,10 @@ function App() {
       username: "You",
       content: text
     };
-
+    
     setPosts([newPost, ...posts]);
   };
+
   return (
     <BrowserRouter>
 

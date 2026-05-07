@@ -1,10 +1,12 @@
 import './navbar.css';
 import { Link } from 'react-router-dom';
 
+// Component for the navigation bar at the left side of the app
 function Navbar(){
     return(
         <div className = "navbar">
             <h1 className = "navbar_title">Twitter_clone</h1>
+            {/* Twitter logo as an SVG element */}
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
@@ -17,6 +19,7 @@ function Navbar(){
                 <path d="M21.742 21.75l-7.563-11.179 7.056-8.321h-2.456l-5.691 6.714-4.54-6.714H2.359l7.29 10.776L2.25 21.75h2.456l6.035-7.118 4.818 7.118h6.191-.008zM7.739 3.818L18.81 20.182h-2.447L5.29 3.818h2.447z"></path>
                 </g>
             </svg>
+            {/* Links to different pages */}
             <div className = "navbar_links">
                 <Link to="/" className="navbar_link">Home</Link>
                 <Link to="/post" className="navbar_link">Post</Link>
