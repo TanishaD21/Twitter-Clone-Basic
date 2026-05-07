@@ -5,11 +5,15 @@ import { useState } from 'react';
 function App() {
   const [count, setCount] = useState(0);
   const[name, setName] = useState("");
+  const [todos, setTodos] = useState([
+    { id: 1, text: "Learn React" },
+    { id: 2, text: "Build a Twitter Clone" },
+    { id: 3, text: "Deploy the App" }
+  ]);
 
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <p>
           You clicked {count} times
         </p>
