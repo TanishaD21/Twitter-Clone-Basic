@@ -5,8 +5,7 @@ function Home() {
       <p className="page-text">Welcome to the home page.</p>
 
       <div className="static-card">
-        <h3>Trending now</h3>
-        <p>This is static content for your home page.</p>
+        
       </div>
 
       <div className="static-card">
@@ -16,5 +15,14 @@ function Home() {
     </div>
   );
 }
-
+function Data()
+{
+    return(
+        <>
+        <div>
+            
+        </div>
+        </>
+    )
+}
 export default Home;
