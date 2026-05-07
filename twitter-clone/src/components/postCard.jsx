@@ -2,22 +2,25 @@ import './postCard.css';
 import CommentSection from './commentSection';
 import { useState } from 'react';
 
-
+// Component to display an individual post with its content, likes, comments, and retweets
 function PostCard(props){
-    const [likes, setLikes] = useState(0);
-    const [comments, setComments] = useState([]);
-    const [retweets, setRetweets] = useState(0);
-    const [showCommentBox, setShowCommentBox] = useState(false);
-    const [commentText, setCommentText] = useState('');
+    const [likes, setLikes] = useState(0);// State to track the number of likes
+    const [comments, setComments] = useState([]);// State to track the comments
+    const [retweets, setRetweets] = useState(0);// State to track the number of retweets
+    const [showCommentBox, setShowCommentBox] = useState(false);// State to toggle the comment box
+    const [commentText, setCommentText] = useState('');// State to track the comment input
 
+    // Function to handle liking the post
     const handleLike = () => {
         setLikes(likes + 1);
     };
 
+    // Function to handle retweeting the post
     const handleRetweet = () => {
         setRetweets(retweets + 1);
     };
 
+    // Function to handle submitting a comment
     const submitComment = () => {
 
         if(commentText.trim() === "") return;
@@ -33,6 +36,7 @@ function PostCard(props){
         <div className = "post-card">
             <h3>{props.username}</h3>
             <p>{props.content}</p>
+            {/* Display the stats for likes, comments, and retweets with corresponding icons */}
             <div className="post-card-stats">
                 <span>{likes} <svg viewBox="0 0 24 24"
                                     width="20"
@@ -47,6 +51,8 @@ function PostCard(props){
                                     height="20"
                                     fill="white"><g><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"></path></g></svg></span>
             </div>
+
+            {/* Buttons for liking, commenting, and retweeting the post */}
             <div className="post-card-actions">
                 <button className="post-card-button" onClick={handleLike}>Like</button>
                 <button
@@ -57,6 +63,8 @@ function PostCard(props){
                 </button>
                 <button className="post-card-button" onClick={handleRetweet}>Retweet</button>
             </div>
+            
+            {/* Conditional rendering of the comment box when the "Comment" button is clicked */}
             {showCommentBox && (
                     <div className='comment-box'>
                         <input type= "text" placeholder = "Write a comment:)" value= {commentText} onChange = {(e) => setCommentText(e.target.value)} />
