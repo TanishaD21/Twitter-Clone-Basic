@@ -8,9 +8,11 @@ const { users, follows } = require('../db/schema');
 // Get user profile by ID, including follower and following counts
 const getUserProfile = async (req, res) => {
     try {
-        // Extract the user ID from the request parameters  
-        const userId = parseInt(req.params.id);
-
+        // Extract the user ID from the request object (set by auth middleware)
+        const userId = req.user?.id;
+        if(!userId){
+            return res.status(401).json({ message: "You are not authenticated" });
+        }
         // Fetch the user profile from the database, including follower and following counts
         const existingUser = await db.select({
             id: users.id,
@@ -49,6 +51,98 @@ const getUserProfile = async (req, res) => {
 };
 
 
+const getFollowingProfile = async (req, res) => {
+
+    try {
+
+        const followingId = Number(req.params.id);
+        if(!followingId) {
+            return res.status(400).json({
+                message: "Invalid user ID"
+            });
+        }
+        
+        const userId = req.user?.id;
+        if(!userId) {
+            return res.status(401).json({
+                message: "You are not authenticated"
+            });
+        }
+
+        // Find user
+        const existingUser = await db
+            .select({id: users.id,
+            name: users.name,
+            username: users.username,
+            email: users.email,
+            bio: users.bio,
+            profileImage: users.profileImage,
+            createdAt: users.createdAt
+        })
+            .from(users)
+            .where(eq(users.id, followingId));
+
+        if (existingUser.length === 0) {
+
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        // Check if current user follows this profile
+        const isFollowing = await db
+            .select()
+            .from(follows)
+            .where(
+                and(
+                    eq(follows.followerId, userId),
+                    eq(follows.followingId, followingId)
+                )
+            );
+
+        if (isFollowing.length === 0) {
+
+            existingUser[0].isFollowing = false;
+
+            return res.status(400).json({
+                message: "You are not following this user"
+            });
+        }
+
+        existingUser[0].isFollowing = true;
+
+        // Followers count
+        const followersCount = await db
+            .select({
+                count: sql`count(*)`
+            })
+            .from(follows)
+            .where(eq(follows.followingId, followingId));
+
+        // Following count
+        const followingCount = await db
+            .select({
+                count: sql`count(*)`
+            })
+            .from(follows)
+            .where(eq(follows.followerId, followingId));
+
+        return res.status(200).json({
+            user: existingUser[0],
+            followersCount: followersCount[0].count,
+            followingCount: followingCount[0].count
+        });
+
+    } catch (error) {
+
+        console.error("Error fetching user profile:", error);
+
+        res.status(500).json({
+            message: "Server error",
+            error: error.message
+        });
+    }
+};
 
 
 
@@ -56,16 +150,19 @@ const getUserProfile = async (req, res) => {
 const updateUserProfile = async (req,res) => {
     try {
         // Extract the authenticated user's ID from the request object (set by auth middleware)
-        const userId = req.user.id;
+        const userId = req.user?.id;
         console.log(req.user);
-
+        if(!userId){
+            return res.status(401).json({ message: "You are not authenticated" });
+        }
         // Extract the updated profile information from the request body
-        const { name, bio, profileImage } = req.body;
-
+        const { name, username, bio, profileImage } = req.body;
+        
         // Update the user's profile in the database with the new information
         const updateUser = await db.update(users)
         .set({
             name:name,
+            username: username,
             bio: bio,
             profileImage: profileImage
         })
@@ -93,9 +190,16 @@ const updateUserProfile = async (req,res) => {
 // Follow a user by creating a new follow relationship in the database
 const followUser = async (req,res) => {
     try {
-        const followerId = req.user.id;
+        const followerId = req.user?.id;
         const followingId = parseInt(req.params.id);
 
+        if(!followerId){
+            return res.status(401).json({ message: "You are not authenticated" });
+        }
+
+        if(!followingId){
+            return res.status(400).json({ message: "Invalid user ID" });
+        }
 
         if(followerId === followingId){
             return res.status(400).json({ message: " you cannot follow yourself" });
@@ -138,9 +242,15 @@ const followUser = async (req,res) => {
 const unfollowUser = async (req,res) => {
     try {
 
-        const followerId = req.user.id;
+        const followerId = req.user?.id;
         const followingId = parseInt(req.params.id);
 
+        if(!followerId){
+            return res.status(401).json({ message: "You are not authenticated" });
+        }
+        if(!followingId){
+            return res.status(400).json({ message: "Invalid user ID" });
+        }
         await db
             .delete(follows)
             .where(
@@ -164,10 +274,14 @@ const unfollowUser = async (req,res) => {
 // Get the list of followers for a user by querying the follows table for users who are following the specified user
 const getFollowers = async (req,res) => {
     try {
-        const userId = parseInt(req.params.id);
-
+        const userId = req.user?.id;
+        if(!userId){
+            return res.status(401).json({ message: "You are not authenticated" });
+        }
         const followers = await db
-            .select().from(follows)
+            .select({ id: follows.id, followerId: follows.followerId, name: users.name, username: users.username, profileImage: users.profileImage })
+            .from(follows)
+            .innerJoin(users, eq(follows.followerId, users.id))
             .where(eq(follows.followingId, userId));
 
         res.status(200).json({ followers });
@@ -186,10 +300,12 @@ const getFollowers = async (req,res) => {
 const getFollowing = async (req,res) => {
     try {
 
-        const  userId = parseInt(req.params.id);
+        const  userId = req.user?.id;
 
         const following = await db
-            .select().from(follows)
+            .select({ id: follows.id, followingId: follows.followingId, name: users.name, username: users.username, profileImage: users.profileImage })
+            .from(follows)
+            .innerJoin(users, eq(follows.followingId, users.id))
             .where(eq(follows.followerId, userId));
 
         res.status(200).json({ following });
@@ -210,5 +326,6 @@ module.exports = {
     followUser,
     unfollowUser,
     getFollowers,
-    getFollowing
+    getFollowing,
+    getFollowingProfile
 };

@@ -6,7 +6,8 @@ const {
     followUser,
     unfollowUser,
     getFollowers,
-    getFollowing
+    getFollowing,
+    getFollowingProfile
 } = require('../controllers/userController');
 
 const authMiddleware = require('../middleware/authMiddleware');
@@ -20,10 +21,12 @@ router.post('/follow/:id', authMiddleware, followUser);
 
 router.delete('/unfollow/:id', authMiddleware, unfollowUser);
 
-router.get('/followers/:id', authMiddleware, getFollowers);
+router.get('/followers', authMiddleware, getFollowers);
 
-router.get('/following/:id', authMiddleware, getFollowing);
+router.get('/following', authMiddleware, getFollowing);
 
-router.get('/:id', authMiddleware, getUserProfile);
+router.get('/', authMiddleware, getUserProfile);
+
+router.get('/:id', authMiddleware, getFollowingProfile);
 
 module.exports = router;
