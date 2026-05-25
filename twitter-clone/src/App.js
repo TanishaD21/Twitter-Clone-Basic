@@ -13,6 +13,7 @@ import { getAllTweets, createTweet } from './services/tweetService';
 import ProtectedRoutes from './components/protectedRoutes';
 
 
+// Main App component that sets up routing and manages posts state
 function App() {
   const [posts, setPosts] = useState([]);
 
@@ -48,6 +49,7 @@ function App() {
       console.log(error);
     }
   };
+
   return (
     <BrowserRouter>
 

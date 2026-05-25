@@ -1,6 +1,7 @@
 import "./feed.css";
 import PostCard from "./postCard";
 
+// Component to display the feed of posts
 function Feed(props){
     console.log(props.posts);
     return(

@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/authContext';
 
+// Component for the navigation bar at the left side of the app
 function Navbar(){
     const { user, logout } = useContext(AuthContext);
     return(
         <div className = "navbar">
             <h1 className = "navbar_title">Twitter_clone</h1>
+            {/* Twitter logo as an SVG element */}
             <svg
                 viewBox="0 0 24 24"
                 aria-hidden="true"
