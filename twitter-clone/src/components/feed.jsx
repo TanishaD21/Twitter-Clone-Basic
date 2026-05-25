@@ -2,10 +2,10 @@ import "./feed.css";
 import PostCard from "./postCard";
 
 function Feed(props){
-
+    console.log(props.posts);
     return(
         <div className="feed">
-
+            
             {(props.posts || []).map(post => (
 
                 <PostCard

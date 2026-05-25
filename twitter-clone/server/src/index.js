@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const cors = require('cors');
 const express = require('express');
 
 const authRoutes = require('./routes/authRoutes');
@@ -9,6 +10,10 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:3000"
+}));
 
 // Middleware to parse JSON bodies
 app.use(express.json());

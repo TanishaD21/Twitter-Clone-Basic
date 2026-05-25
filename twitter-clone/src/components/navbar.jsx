@@ -1,7 +1,10 @@
 import './navbar.css';
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../context/authContext';
 
 function Navbar(){
+    const { user, logout } = useContext(AuthContext);
     return(
         <div className = "navbar">
             <h1 className = "navbar_title">Twitter_clone</h1>
@@ -17,10 +20,33 @@ function Navbar(){
                 <path d="M21.742 21.75l-7.563-11.179 7.056-8.321h-2.456l-5.691 6.714-4.54-6.714H2.359l7.29 10.776L2.25 21.75h2.456l6.035-7.118 4.818 7.118h6.191-.008zM7.739 3.818L18.81 20.182h-2.447L5.29 3.818h2.447z"></path>
                 </g>
             </svg>
-            <div className = "navbar_links">
-                <Link to="/" className="navbar_link">Home</Link>
-                <Link to="/post" className="navbar_link">Post</Link>
-            </div>
+            {
+                user ? (
+                    <>
+                        <p> Hi {user.name} </p>
+
+                        <div className = "navbar_links">
+                            <Link to="/" className="navbar_link">Home</Link>
+                            <Link to="/post" className="navbar_link">Post</Link>
+                        </div>
+
+                        <button onClick={logout}>
+                            LogOut
+                        </button>
+                    </>
+                ) 
+                : (
+                    <>
+                        <p> Not logged in yet!</p>
+                        <div className = "navbar_links">
+                            <Link to="/login" className="navbar_link">Login</Link>
+                            <Link to="/signup" className="navbar_link">SignUp</Link>
+                        </div>
+                    </>
+                )
+            } 
+
+            
         </div>
     );
 }

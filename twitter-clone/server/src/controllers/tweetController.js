@@ -1,6 +1,6 @@
-const { tweets,users, follows }= require("../db/schema.js");
+const { tweets,users, likes }= require("../db/schema.js");
 const db = require("../db");
-const { eq, desc }=require("drizzle-orm");
+const { eq, desc, inArray }=require("drizzle-orm");
 
 // This is the create tweet function where user is able to create tweet.
 async function createTweet(req,res)
@@ -63,16 +63,71 @@ async function deleteTweet(req,res)
 
 
 // This is the view our tweets function where the user can see all the tweets posted by them.
-async function viewOurTweets(req,res)
-{
-    const userId=req.user?.id;
-    if(!userId)
-    {
-        res.status(401).json({message:"User not authenticated"});
+async function viewOurTweets(req, res) {
+    const userId = req.user?.id;
+ 
+    if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
     }
-    const viewTweets=await db.select().from(tweets).where(eq(tweets.userId,userId));
-    return res.status(200).json({message:"View All User Tweets",tweets:viewTweets});
-};
+ 
+    const viewTweets = await db
+        .select({
+            tweetId: tweets.id,
+            content: tweets.content,
+            createdAt: tweets.createdAt,
+            updatedAt: tweets.updatedAt,
+        })
+        .from(tweets)
+        .where(eq(tweets.userId, userId))
+        .orderBy(desc(tweets.createdAt));
+ 
+    if (viewTweets.length === 0) {
+        return res.status(200).json({ tweets: viewTweets});
+    }
+ 
+    const tweetIds = viewTweets.map((tweet) => tweet.tweetId);
+ 
+    const tweetLikes = await db
+        .select({
+            likeId: likes.id,
+            tweetId: likes.tweet_id,
+            likerId: users.id,
+            likerUsername: users.username,
+            likerName: users.name,
+            likedAt: likes.createdAt,
+        })
+        .from(likes)
+        .innerJoin(users, eq(likes.user_id, users.id))
+        .where(inArray(likes.tweet_id, tweetIds))
+        .orderBy(desc(likes.createdAt));
+ 
+    const likesMap = {};
+ 
+    for (const like of tweetLikes) {
+        if (!likesMap[like.tweetId]) {
+            likesMap[like.tweetId] = [];
+        }
+ 
+        likesMap[like.tweetId].push({
+            likeId: like.likeId,
+            userId: like.likerId,
+            name: like.likerName,
+            username: like.likerUsername,
+            likedAt: like.likedAt,
+        });
+    }
+ 
+    const result = viewTweets.map((tweet) => ({
+        ...tweet,
+        likesCount: (likesMap[tweet.tweetId] || []).length,
+        likes: likesMap[tweet.tweetId] || [],
+    }));
+ 
+    return res.status(200).json({
+        message: "View All User Tweets",
+        tweets: result,
+    });
+} 
 
 
 // This is the update tweet function where the user can update their own tweets.

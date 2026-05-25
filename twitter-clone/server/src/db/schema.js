@@ -56,14 +56,11 @@ const tweets = pgTable(
 
 
 //LIKES TABLE
-const likes = pgTable("like", {
-    // Primary key with auto-incrementing ID
+const likes=pgTable("likes",{
     id: serial("id").primaryKey(),
-    // Foreign key referencing the user who liked the tweet
-    userId: integer("user_id").references(() => users.id,{onDelete: "cascade"}).notNull(),
-    // Foreign key referencing the liked tweet
-    tweetId: integer("tweet_id").references(() => tweets.id,{onDelete: "cascade"}).notNull()
-
+    tweet_id: integer("tweet_id").references(()=>tweets.id,{onDelete:"cascade"}).notNull(),
+    user_id: integer("user_id").references(()=>users.id,{onDelete:"cascade"}).notNull(),
+    createdAt:timestamp("created_at").defaultNow().notNull()
 });
 
 
