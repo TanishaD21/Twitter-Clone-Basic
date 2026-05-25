@@ -3,10 +3,10 @@ import PostCard from "./postCard";
 
 // Component to display the feed of posts
 function Feed(props){
-
+    console.log(props.posts);
     return(
         <div className="feed">
-            {/* Map through the posts passed as props and display each post using the PostCard component */}
+            
             {(props.posts || []).map(post => (
 
                 <PostCard
