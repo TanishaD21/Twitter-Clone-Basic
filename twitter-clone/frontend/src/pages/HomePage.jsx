@@ -15,7 +15,7 @@ function HomePage() {
         setError("");
 
         const response = await getAllTweets();
-        setTweets(response.data.AllTweets || response.data.allTweets || response.data.tweets || []);
+        setTweets(response.data.AllTweets || []);
         } catch (err) {
         console.log(err);
         setError(err.response?.data?.message || "Failed to load tweets.");
