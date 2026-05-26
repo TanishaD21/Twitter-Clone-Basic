@@ -68,7 +68,7 @@ async function deleteComment(req,res)
         {
             return res.status(404).json({message:"No comments found on particular tweet"});
         }
-        const deletedComment=await db.delete().from(comments).where(eq(comments.id,commentId));
+        const deletedComment=await db.delete(comments).where(eq(comments.id,commentId));
         return res.status(200).json({message:"Deleted Comment Succesfully"});
     }
     catch(error)
@@ -146,17 +146,17 @@ async function viewComments(req,res)
             return res.status(400).json({message:"Tweet id not found"});
         }
         const tweet=await db.select().from(tweets).where(eq(tweets.id,tweetId));
-        if(tweet.length==0)
+        if(tweet.length===0)
         {
             return res.status(404).json({message:"Tweet not found"});
         }
         const isValidUserForCommenting=await db.select().from(follows).where(and(eq(follows.followerId,userId),eq(follows.followingId,tweet[0].userId)));
-        if(isValidUserForCommenting.length==0)
+        if(isValidUserForCommenting.length===0)
         {
             return res.status(403).json({message:"You can only comment on the tweet to whom you are following"});
         }
         const viewComments=await db.select().from(comments).where(eq(comments.tweet_id,tweetId));
-        if(viewComments.length==0)
+        if(viewComments.length===0)
         {
             return res.status(200).json({comments:viewComments});
         }

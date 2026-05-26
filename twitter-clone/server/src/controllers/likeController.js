@@ -1,5 +1,5 @@
 const {tweets,follows,likes}=require("../db/schema");
-const db=require("../dbs");
+const db=require("../db");
 const {eq,and}=require("drizzle-orm")
 
 
@@ -26,12 +26,12 @@ async function like(req,res)
         {
             return res.status(403).json({message:"You can only like on the tweet to whom you are following"});
         }
-        const existingLike=await db.select().from(likes).where(and(eq(likes.tweet_id,tweetId),eq(likes.user_id,userId)));
+        const existingLike=await db.select().from(likes).where(and(eq(likes.tweetId,tweetId),eq(likes.userId,userId)));
         if(existingLike.length>0)
         {
             return res.status(200).json({message:"You have already liked the tweet"});
         }
-        const newLike=await db.insert(likes).values({tweet_id:tweetId,user_id:userId}).returning();
+        const newLike=await db.insert(likes).values({tweetId:tweetId,userId:userId}).returning();
         return res.status(200).json({message:"Added like successfully",like:newLike[0]});
     }
     catch(error)
@@ -69,12 +69,12 @@ async function unlike(req,res)
         {
             return res.status(403).json({message:"You can only unlike on the tweet to whom you are following"});
         }
-        const hasLiked=await db.select().from(likes).where(and(eq(likes.user_id,userId),eq(likes.tweet_id,tweetId)));
+        const hasLiked=await db.select().from(likes).where(and(eq(likes.userId,userId),eq(likes.tweetId,tweetId)));
         if(hasLiked.length===0)
         {
             return res.status(404).json({message:"You have not liked the tweet"});
         }
-        const unliked=await db.delete().from(likes).where(and(eq(likes.user_id,userId),eq(likes.tweet_id,tweetId)));
+        const unliked=await db.delete(likes).where(and(eq(likes.userId,userId),eq(likes.tweetId,tweetId)));
         return res.status(200).json({message:"Tweet Unliked Successfully"});
     }
     catch(error)

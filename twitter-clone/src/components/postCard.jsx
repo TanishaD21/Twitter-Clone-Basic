@@ -1,18 +1,32 @@
 import './postCard.css';
 import CommentSection from './commentSection';
 import { useState } from 'react';
+import { likeTweet, unlikeTweet, addComment, getComments } from '../services/tweetService';
 
 // Component to display an individual post with its content, likes, comments, and retweets
 function PostCard(props){
-    const [likes, setLikes] = useState(0);// State to track the number of likes
+    const [likes, setLikes] = useState(props.likesCount || 0);// State to track the number of likes
+    const [liked, setLiked] = useState(props.likedByCurrentUser); //State to track whether the current user has liked the post or not
     const [comments, setComments] = useState([]);// State to track the comments
     const [retweets, setRetweets] = useState(0);// State to track the number of retweets
     const [showCommentBox, setShowCommentBox] = useState(false);// State to toggle the comment box
     const [commentText, setCommentText] = useState('');// State to track the comment input
 
     // Function to handle liking the post
-    const handleLike = () => {
-        setLikes(likes + 1);
+    const handleLike = async() => {
+        try{
+            if(liked){
+                await unlikeTweet(props.id);
+                setLiked(false);
+                setLikes((prev) => Math.max(0, prev - 1));
+            }else{
+                await likeTweet(props.id);
+                setLiked(true);
+                setLikes((prev) => prev + 1);
+            }
+        }catch(error){
+            console.log(error);
+        }
     };
 
     // Function to handle retweeting the post
@@ -20,16 +34,32 @@ function PostCard(props){
         setRetweets(retweets + 1);
     };
 
+    //Function to fetch the comments of a tweet
+    const fetchComments = async() => {
+        try{
+            const data  = await getComments(props.id);
+            setComments(data.comments || []);
+        }catch(error){
+            console.log(error);
+        }
+    }
+
     // Function to handle submitting a comment
-    const submitComment = () => {
+    const submitComment = async() => {
 
         if(commentText.trim() === "") return;
 
-        setComments([...comments, commentText]);
+        try{
+            await addComment(
+                props.id,
+                commentText
+            )
 
-        setCommentText("");
-
-        setShowCommentBox(false);
+            await fetchComments();
+            setCommentText("");
+        }catch(error){
+            console.log(error);
+        }
     };
 
     return(
@@ -54,10 +84,15 @@ function PostCard(props){
 
             {/* Buttons for liking, commenting, and retweeting the post */}
             <div className="post-card-actions">
-                <button className="post-card-button" onClick={handleLike}>Like</button>
+                <button className="post-card-button" onClick={handleLike}>{liked ? "unlike" : "like"}</button>
                 <button
                     className="post-card-button"
-                    onClick={() => setShowCommentBox(!showCommentBox)}
+                    onClick={async() => {const nextState = !showCommentBox;
+                            setShowCommentBox(nextState);
+                            if(nextState){
+                                await fetchComments();
+                            }
+                    }}
                     >
                     Comment
                 </button>
@@ -72,6 +107,11 @@ function PostCard(props){
                     </div>
                 )}
             <CommentSection  comments={comments}/>
+
+            { props.currentUserId === props.userId && (
+                <button onClick = { () => {props.onDelete(props.id)}}>Delete</button>
+            )}
+            
         </div>
     );
 }

@@ -21,7 +21,7 @@ function Home(props) {
 
         <div>
 
-            <Feed posts={props.posts} />
+            <Feed posts={props.posts} onDelete={props.onDelete} />
 
         </div>
 

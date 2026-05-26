@@ -5,7 +5,7 @@ const router=express.Router();
 
 router.post('/:id',authenticationMiddleware,addComment);
 router.delete('/:id',authenticationMiddleware,deleteComment);
-router.post('/:id',authenticationMiddleware,updateComment);
+router.patch('/:id',authenticationMiddleware,updateComment);
 router.get('/',authenticationMiddleware,viewOwnComment);
 router.get('/:id',authenticationMiddleware,viewComments);
 module.exports=router

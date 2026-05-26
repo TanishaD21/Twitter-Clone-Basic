@@ -8,7 +8,7 @@ import Post from './pages/postPage';
 import Login from './pages/loginPage';
 import SignUp from './pages/signUpPage';
 
-import { getAllTweets, createTweet } from './services/tweetService';
+import { getAllTweets, createTweet, deleteTweet } from './services/tweetService';
 
 import ProtectedRoutes from './components/protectedRoutes';
 
@@ -22,7 +22,7 @@ function App() {
           try{
             const data = await getAllTweets();
             console.log(data);
-            setPosts(data.AllTweets);
+            setPosts(data.tweets);
           }catch(error){
             console.log(error)
           }
@@ -43,7 +43,21 @@ function App() {
       
       const updatedTweets = await getAllTweets();
 
-      setPosts(updatedTweets.AllTweets);
+      setPosts(updatedTweets.tweets);
+
+    }catch(error){
+      console.log(error);
+    }
+  };
+
+  const handleDeletePost = async(tweetId) => {
+    try{
+      await deleteTweet(tweetId);
+      setPosts((prevPosts) => 
+        prevPosts.filter(
+          (post) => post.id !== tweetId
+        )
+      );
 
     }catch(error){
       console.log(error);
@@ -65,7 +79,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoutes>
-                  <Home posts={posts} />
+                  <Home posts={posts} onDelete={handleDeletePost} />
                 </ProtectedRoutes>}
             />
 

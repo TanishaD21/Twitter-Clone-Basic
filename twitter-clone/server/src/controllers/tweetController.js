@@ -1,6 +1,6 @@
 const { tweets,users, likes }= require("../db/schema.js");
 const db = require("../db");
-const { eq, desc, inArray }=require("drizzle-orm");
+const { eq, desc, inArray  }=require("drizzle-orm");
 
 // This is the create tweet function where user is able to create tweet.
 async function createTweet(req,res)
@@ -33,9 +33,9 @@ async function createTweet(req,res)
 async function deleteTweet(req,res)
 {
     try{
-        const tweetId=Number(req.params.id);
+        const id=Number(req.params.id);
         const userId=req.user?.id;
-        if(!tweetId)
+        if(!id)
         {
             return res.status(400).json({message:"Tweet id not found"});
         }
@@ -43,7 +43,7 @@ async function deleteTweet(req,res)
         {
             return res.status(401).json({message:"User not authenticated"})
         }
-        const existingTweet=await db.select().from(tweets).where(eq(tweets.id,tweetId));
+        const existingTweet=await db.select().from(tweets).where(eq(tweets.id,id));
         if(existingTweet.length===0)
         {
             return res.status(404).json({message:"Tweet not found"});
@@ -52,7 +52,7 @@ async function deleteTweet(req,res)
         {
             return res.status(403).json({message:"You can only delete your own tweets"});
         }
-        await db.delete(tweets).where(eq(tweets.id,tweetId)).returning();
+        await db.delete(tweets).where(eq(tweets.id,id)).returning();
         return res.status(200).json({message:"Tweet deleted successfully"});
     }
     catch(error)
@@ -72,7 +72,7 @@ async function viewOurTweets(req, res) {
  
     const viewTweets = await db
         .select({
-            tweetId: tweets.id,
+            id: tweets.id,
             content: tweets.content,
             createdAt: tweets.createdAt,
             updatedAt: tweets.updatedAt,
@@ -85,30 +85,30 @@ async function viewOurTweets(req, res) {
         return res.status(200).json({ tweets: viewTweets});
     }
  
-    const tweetIds = viewTweets.map((tweet) => tweet.tweetId);
+    const ids = viewTweets.map((tweet) => tweet.id);
  
     const tweetLikes = await db
         .select({
             likeId: likes.id,
-            tweetId: likes.tweet_id,
+            id: likes.tweetId,
             likerId: users.id,
             likerUsername: users.username,
             likerName: users.name,
             likedAt: likes.createdAt,
         })
         .from(likes)
-        .innerJoin(users, eq(likes.user_id, users.id))
-        .where(inArray(likes.tweet_id, tweetIds))
+        .innerJoin(users, eq(likes.userId, users.id))
+        .where(inArray(likes.tweetId, ids))
         .orderBy(desc(likes.createdAt));
  
     const likesMap = {};
  
     for (const like of tweetLikes) {
-        if (!likesMap[like.tweetId]) {
-            likesMap[like.tweetId] = [];
+        if (!likesMap[like.id]) {
+            likesMap[like.id] = [];
         }
  
-        likesMap[like.tweetId].push({
+        likesMap[like.id].push({
             likeId: like.likeId,
             userId: like.likerId,
             name: like.likerName,
@@ -119,8 +119,11 @@ async function viewOurTweets(req, res) {
  
     const result = viewTweets.map((tweet) => ({
         ...tweet,
-        likesCount: (likesMap[tweet.tweetId] || []).length,
-        likes: likesMap[tweet.tweetId] || [],
+        likesCount: (likesMap[tweet.id] || []).length,
+        likes: likesMap[tweet.id] || [],
+        likedByCurrentUser: (likesMap[tweet.id] || []).some(
+            (like) => like.userId === userId
+),
     }));
  
     return res.status(200).json({
@@ -135,16 +138,16 @@ async function updateTweet(req,res)
 {
     const {newContent}=req.body || {};
     const userId=req.user?.id;
-    const tweetId=Number(req.params.id);
+    const id=Number(req.params.id);
     if(!userId)
     {
         return res.status(401).json({message:"User not authenticated"});
     }
-    if(!tweetId)
+    if(!id)
     {
         return res.status(400).json({message:"Tweet not found"});
     }
-    const existingTweet=await db.select().from(tweets).where(eq(tweets.id,tweetId));
+    const existingTweet=await db.select().from(tweets).where(eq(tweets.id,id));
     if(existingTweet.length===0)
     {
         return res.status(404).json({message:"Tweet not found"});
@@ -158,7 +161,7 @@ async function updateTweet(req,res)
     {
         return res.status(400).json({message:"The tweet cannot be empty. Add some content in it"});
     }
-    const updatedTweet=await db.update(tweets).set({content:newContent.trim(),updatedAt:new Date()}).where(eq(tweets.id,tweetId)).returning();
+    const updatedTweet=await db.update(tweets).set({content:newContent.trim(),updatedAt:new Date()}).where(eq(tweets.id,id)).returning();
     return res.status(200).json({message:"Content changed successfully",Updated_Content:updatedTweet[0]});
 }
 
@@ -166,9 +169,11 @@ async function updateTweet(req,res)
 // This is the view all tweets function where the user can see all the tweets posted by all the users.
 async function viewAllTweets(req, res) {
     try {
+        const userId = req.user?.id;
+
         const viewAllTweets = await db
             .select({
-                tweetId: tweets.id,
+                id: tweets.id,
                 content: tweets.content,
                 createdAt: tweets.createdAt,
                 userId: users.id,
@@ -185,9 +190,50 @@ async function viewAllTweets(req, res) {
             });
         }
 
+        const ids = viewAllTweets.map((tweet) => tweet.id);
+    
+        const tweetLikes = await db
+            .select({
+                likeId: likes.id,
+                id: likes.tweetId,
+                likerId: users.id,
+                likerUsername: users.username,
+                likerName: users.name,
+                likedAt: likes.createdAt,
+            })
+            .from(likes)
+            .innerJoin(users, eq(likes.userId, users.id))
+            .where(inArray(likes.tweetId, ids))
+            .orderBy(desc(likes.createdAt));
+    
+        const likesMap = {};
+    
+        for (const like of tweetLikes) {
+            if (!likesMap[like.id]) {
+                likesMap[like.id] = [];
+            }
+    
+            likesMap[like.id].push({
+                likeId: like.likeId,
+                userId: like.likerId,
+                name: like.likerName,
+                username: like.likerUsername,
+                likedAt: like.likedAt,
+            });
+        }
+    
+        const result = viewAllTweets.map((tweet) => ({
+            ...tweet,
+            likesCount: (likesMap[tweet.id] || []).length,
+            likes: likesMap[tweet.id] || [],
+            likedByCurrentUser: (likesMap[tweet.id] || []).some(
+                (like) => like.userId === userId
+                ),
+        }));
+    
         return res.status(200).json({
-            message: "View All Tweets",
-            AllTweets: viewAllTweets
+            message: "View All User Tweets",
+            tweets: result,
         });
 
     } catch (error) {
