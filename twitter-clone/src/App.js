@@ -7,8 +7,9 @@ import Home from './pages/homePage';
 import Post from './pages/postPage';
 import Login from './pages/loginPage';
 import SignUp from './pages/signUpPage';
+import ProfilePage from './pages/profilePage';
 
-import { getAllTweets, createTweet, deleteTweet } from './services/tweetService';
+import { getAllTweets,getFollowingTweets, createTweet, deleteTweet } from './services/tweetService';
 
 import ProtectedRoutes from './components/protectedRoutes';
 
@@ -16,21 +17,38 @@ import ProtectedRoutes from './components/protectedRoutes';
 // Main App component that sets up routing and manages posts state
 function App() {
   const [posts, setPosts] = useState([]);
+  const [activeTab, setActiveTab] = useState("forYou");
 
   useEffect(() => {
-    const fetchTweets = async() => {
-          try{
-            const data = await getAllTweets();
-            console.log(data);
+
+      const fetchTweets = async() => {
+
+        try {
+
+          let data;
+
+          if(activeTab === "forYou") {
+
+            data = await getAllTweets();
             setPosts(data.tweets);
-          }catch(error){
-            console.log(error)
+
           }
-    };
 
-    fetchTweets();
+          else {
 
-  },[]);
+            data = await getFollowingTweets();
+            setPosts(data.tweets);
+
+          }
+
+        } catch(error) {
+          console.log(error);
+        }
+      };
+
+      fetchTweets();
+
+  }, [activeTab]);
 
   const handleNewPost = async(text) => {
     try{
@@ -41,9 +59,16 @@ function App() {
       console.log(response);
 
       
-      const updatedTweets = await getAllTweets();
+      let updatedTweets;
 
-      setPosts(updatedTweets.tweets);
+      if(activeTab === "forYou") {
+          updatedTweets = await getAllTweets();
+          setPosts(updatedTweets.tweets);
+      }
+      else {
+          updatedTweets = await getFollowingTweets();
+          setPosts(updatedTweets.tweets);
+      }
 
     }catch(error){
       console.log(error);
@@ -79,7 +104,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoutes>
-                  <Home posts={posts} onDelete={handleDeletePost} />
+                  <Home posts={posts} onDelete={handleDeletePost} activeTab={activeTab} setActiveTab={setActiveTab} />
                 </ProtectedRoutes>}
             />
 
@@ -89,6 +114,15 @@ function App() {
                 <ProtectedRoutes>
                   <Post addPost={handleNewPost} />
                 </ProtectedRoutes>}
+            />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoutes>
+                  <ProfilePage />
+                </ProtectedRoutes>
+              }
             />
 
             <Route

@@ -1,18 +1,18 @@
 import './postCard.css';
 import CommentSection from './commentSection';
 import { useState } from 'react';
-import { likeTweet, unlikeTweet, addComment, getComments } from '../services/tweetService';
+import { likeTweet, unlikeTweet, addComment, getComments, deleteComments, updateComments } from '../services/tweetService';
+import { formatTime } from '../utils/formatTime';
 
-// Component to display an individual post with its content, likes, comments, and retweets
 function PostCard(props){
-    const [likes, setLikes] = useState(props.likesCount || 0);// State to track the number of likes
-    const [liked, setLiked] = useState(props.likedByCurrentUser); //State to track whether the current user has liked the post or not
-    const [comments, setComments] = useState([]);// State to track the comments
-    const [retweets, setRetweets] = useState(0);// State to track the number of retweets
-    const [showCommentBox, setShowCommentBox] = useState(false);// State to toggle the comment box
-    const [commentText, setCommentText] = useState('');// State to track the comment input
+    const [likes, setLikes] = useState(props.likesCount || 0);
+    const [liked, setLiked] = useState(props.likedByCurrentUser);
+    const [commentsCount, setCommentsCount] = useState(props.commentsCount || 0);
+    const [comments, setComments] = useState([]);
+    const [retweets, setRetweets] = useState(0);
+    const [showCommentBox, setShowCommentBox] = useState(false);
+    const [commentText, setCommentText] = useState('');
 
-    // Function to handle liking the post
     const handleLike = async() => {
         try{
             if(liked){
@@ -29,89 +29,150 @@ function PostCard(props){
         }
     };
 
-    // Function to handle retweeting the post
     const handleRetweet = () => {
         setRetweets(retweets + 1);
     };
 
-    //Function to fetch the comments of a tweet
-    const fetchComments = async() => {
+    const handleFetchComment = async() => {
         try{
-            const data  = await getComments(props.id);
+            const data = await getComments(props.id);
             setComments(data.comments || []);
         }catch(error){
             console.log(error);
         }
-    }
+    };
 
-    // Function to handle submitting a comment
-    const submitComment = async() => {
-
+    const handleSubmitComment = async() => {
         if(commentText.trim() === "") return;
-
         try{
-            await addComment(
-                props.id,
-                commentText
-            )
-
-            await fetchComments();
+            await addComment(props.id, commentText);
+            setCommentsCount(prev =>  prev + 1 );
+            await handleFetchComment();
             setCommentText("");
+            
+        }catch(error){
+            console.log(error);
+        }
+    };
+
+    const handleDeleteComment = async(commentId) => {
+        try{
+            await deleteComments(props.id, commentId);
+            await handleFetchComment();
+        }catch(error){
+            console.log(error);
+        }
+    };
+
+    const handleUpdateComment = async(commentId, updatedContent) => {
+        try{
+            await updateComments(props.id, commentId, updatedContent);
+            await handleFetchComment();
         }catch(error){
             console.log(error);
         }
     };
 
     return(
-        <div className = "post-card">
-            <h3>{props.username}</h3>
-            <p>{props.content}</p>
-            {/* Display the stats for likes, comments, and retweets with corresponding icons */}
-            <div className="post-card-stats">
-                <span>{likes} <svg viewBox="0 0 24 24"
-                                    width="20"
-                                    height="20"
-                                    fill="white"><g><path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"></path></g></svg></span>
-                <span>{comments.length} <svg viewBox="0 0 24 24"
-                                    width="20"
-                                    height="20"
-                                    fill="white"><g><path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"></path></g></svg></span>
-                <span>{retweets} <svg viewBox="0 0 24 24"
-                                    width="20"
-                                    height="20"
-                                    fill="white"><g><path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"></path></g></svg></span>
+        <div className="post-card">
+            {/* Avatar circle using first letter of username */}
+            <div
+                className="post-card-avatar"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 16, color: '#fff', background: '#1d9bf0', flexShrink: 0 }}
+            >
+                {props.username?.[0]?.toUpperCase() || 'U'}
             </div>
 
-            {/* Buttons for liking, commenting, and retweeting the post */}
-            <div className="post-card-actions">
-                <button className="post-card-button" onClick={handleLike}>{liked ? "unlike" : "like"}</button>
-                <button
-                    className="post-card-button"
-                    onClick={async() => {const nextState = !showCommentBox;
+            <div className="post-card-body">
+                {/* Meta: name · handle · time */}
+                <div className="post-card-meta">
+                    <h3>{props.username}</h3>
+                    <span className="post-card-handle">@{props.username?.toLowerCase().replace(/\s+/g, '')}</span>
+                    <span className="post-card-dot">·</span>
+                    <span className="post-card-time">{formatTime(props.createdAt)}</span>
+                </div>
+
+                <p>{props.content}</p>
+
+                {/* Stats row */}
+                <div className="post-card-stats">
+                    <span>{likes} likes · {commentsCount} comments · {retweets} retweets</span>
+                </div>
+
+                {/* Action buttons */}
+                <div className="post-card-actions">
+                    {/* Comment */}
+                    <button
+                        className="post-card-button"
+                        onClick={async() => {
+                            const nextState = !showCommentBox;
                             setShowCommentBox(nextState);
-                            if(nextState){
-                                await fetchComments();
-                            }
-                    }}
+                            if(nextState){ await handleFetchComment(); }
+                        }}
+                        title="Comment"
                     >
-                    Comment
-                </button>
-                <button className="post-card-button" onClick={handleRetweet}>Retweet</button>
-            </div>
-            
-            {/* Conditional rendering of the comment box when the "Comment" button is clicked */}
-            {showCommentBox && (
-                    <div className='comment-box'>
-                        <input type= "text" placeholder = "Write a comment:)" value= {commentText} onChange = {(e) => setCommentText(e.target.value)} />
-                        <button onClick={submitComment}>Add</button>
-                    </div>
-                )}
-            <CommentSection  comments={comments}/>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        <span>{commentsCount}</span>
+                    </button>
 
-            { props.currentUserId === props.userId && (
-                <button onClick = { () => {props.onDelete(props.id)}}>Delete</button>
-            )}
-            
+                    {/* Retweet */}
+                    <button className="post-card-button repost-btn" onClick={handleRetweet} title="Retweet">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+                        {retweets > 0 && <span>{retweets}</span>}
+                    </button>
+
+                    {/* Like */}
+                    <button className="post-card-button like-btn" onClick={handleLike} title={liked ? "Unlike" : "Like"}>
+                        <svg viewBox="0 0 24 24" fill={liked ? "#f91880" : "none"} stroke={liked ? "#f91880" : "currentColor"} strokeWidth="2" width="18" height="18"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                        {likes > 0 && <span style={{ color: liked ? '#f91880' : undefined }}>{likes}</span>}
+                    </button>
+
+                    {/* Share */}
+                    <button className="post-card-button" title="Share">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+
+                {/* Comment input box */}
+                {showCommentBox && (
+                    <>
+                        <div className="comment-box" style={{ display: 'flex', gap: 8, marginTop: 12, paddingTop: 12, borderTop: '1px solid #2f3336' }}>
+                            <input
+                                type="text"
+                                placeholder="Write a comment..."
+                                value={commentText}
+                                onChange={(e) => setCommentText(e.target.value)}
+                                style={{ flex: 1, background: 'transparent', border: '1px solid #333639', borderRadius: 4, padding: '10px 12px', color: '#e7e9ea', fontSize: 15, outline: 'none' }}
+                                onFocus={e => e.target.style.borderColor = '#1d9bf0'}
+                                onBlur={e => e.target.style.borderColor = '#333639'}
+                            />
+                            <button
+                                onClick={handleSubmitComment}
+                                style={{ padding: '8px 16px', border: 'none', borderRadius: '9999px', background: '#1d9bf0', color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+                            >
+                                Reply
+                            </button>
+                        </div>
+
+                        <CommentSection
+                            comments={comments}
+                            currentUserId={props.currentUserId}
+                            onDeleteComment={handleDeleteComment}
+                            onUpdateComment={handleUpdateComment}
+                        />
+                    </>
+                )}
+
+                {/* Delete post — only for post owner */}
+                {props.currentUserId === props.userId && (
+                    <button
+                        onClick={() => props.onDelete(props.id)}
+                        style={{ marginTop: 10, background: 'none', border: 'none', color: '#71767b', fontSize: 13, cursor: 'pointer', padding: '4px 0' }}
+                    >
+                        Delete post
+                    </button>
+                )}
+            </div>
         </div>
     );
 }

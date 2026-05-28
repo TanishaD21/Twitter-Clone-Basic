@@ -3,6 +3,7 @@ import api from "../services/api";
 
 import { useEffect } from 'react';
 
+import './homePage.css';
 
 function Home(props) {
     useEffect(() =>{
@@ -19,10 +20,10 @@ function Home(props) {
 
     return (
 
-        <div>
-
-            <Feed posts={props.posts} onDelete={props.onDelete} />
-
+        <div className="home-page">
+            <div className="home-content">
+                <Feed posts={props.posts} onDelete={props.onDelete} activeTab={props.activeTab} setActiveTab={props.setActiveTab}/>
+            </div>
         </div>
 
     );

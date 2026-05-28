@@ -1,4 +1,4 @@
-const {tweets,follows,likes}=require("../db/schema");
+const {tweets,follows,likes, users}=require("../db/schema");
 const db=require("../db");
 const {eq,and}=require("drizzle-orm")
 
@@ -21,8 +21,9 @@ async function like(req,res)
         {
             return res.status(404).json({message:"Tweet not found"});
         }
+        const isTweetOwner = tweet[0].userId === userId;
         const isValidUserForPerformingLike=await db.select().from(follows).where(and(eq(follows.followerId,userId),eq(follows.followingId,tweet[0].userId)));
-        if(isValidUserForPerformingLike.length===0)
+        if(!isTweetOwner && isValidUserForPerformingLike.length===0)
         {
             return res.status(403).json({message:"You can only like on the tweet to whom you are following"});
         }
@@ -64,8 +65,9 @@ async function unlike(req,res)
         {
             return res.status(404).json({message:"Tweet not found"});
         }
+        const isTweetOwner = tweet[0].userId === userId;
         const isValidUserForPerformingUnLike=await db.select().from(follows).where(and(eq(follows.followerId,userId),eq(follows.followingId,tweet[0].userId)));
-        if(isValidUserForPerformingUnLike.length===0)
+        if(!isTweetOwner && isValidUserForPerformingUnLike.length===0)
         {
             return res.status(403).json({message:"You can only unlike on the tweet to whom you are following"});
         }
