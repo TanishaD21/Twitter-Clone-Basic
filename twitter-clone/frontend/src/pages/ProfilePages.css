@@ -1,0 +1,38 @@
+.profile-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.profile-left {
+  flex: 2;
+}
+
+.profile-right {
+  flex: 1;
+  min-width: 280px;
+  padding: 16px;
+  border-left: 1px solid #ddd;
+}
+
+.profile-stats {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.profile-stats button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  background: #38bdf8;
+  color: white;
+}
+
+.side-user-card {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: #f5f5f5;
+}

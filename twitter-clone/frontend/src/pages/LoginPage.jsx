@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {loginUser} from "../api/authApi.js"
+import {loginUser} from "../api/authApi.js";
+// import "./LoginPage.css";
 
 function LoginPage() {
     const [formData, setFormData] = useState({
@@ -30,9 +31,17 @@ function LoginPage() {
     try {
         setLoading(true);
         const response = await loginUser(formData);
-        const { token } = response.data;
+        const { token,user } = response.data;
         if (token) {
             localStorage.setItem("token", token);
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    name: user.name
+                })
+            );
         }
         navigate("/");
     } 

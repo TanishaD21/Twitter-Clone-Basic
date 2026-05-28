@@ -1,0 +1,176 @@
+.tweet-card {
+  border: 1px solid var(--card-border);
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.92), rgba(15, 23, 42, 0.88));
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 18px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.tweet-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.08), transparent 50%);
+  pointer-events: none;
+}
+
+.tweet-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(56, 189, 248, 0.35);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+}
+
+.tweet-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.tweet-card h4 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+  color: #ffffff;
+}
+
+.tweet-card-header p {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.tweet-content {
+  margin: 14px 0;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #e5e7eb;
+  line-height: 1.6;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.tweet-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+.tweet-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.tweet-actions button,
+.edit-buttons button {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.tweet-actions button:first-child,
+.edit-buttons button:first-child {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: white;
+}
+
+.tweet-actions button:first-child:hover,
+.edit-buttons button:first-child:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.tweet-actions button:last-child {
+  background: rgba(248, 113, 113, 0.14);
+  color: #fecaca;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.tweet-actions button:last-child:hover {
+  background: rgba(248, 113, 113, 0.22);
+  transform: translateY(-1px);
+}
+
+.edit-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.edit-box textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border-radius: 16px;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(15, 23, 42, 0.95);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.edit-box textarea:focus {
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+}
+
+.edit-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.edit-buttons button:last-child {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+.edit-buttons button:last-child:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.tweet-likes {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  position: relative;
+  z-index: 1;
+}
+
+.tweet-likes strong {
+  color: #ffffff;
+}
+
+.tweet-likes ul {
+  margin: 10px 0 0;
+  padding-left: 20px;
+  color: var(--text-soft);
+}
+
+.tweet-likes li {
+  margin-bottom: 6px;
+}

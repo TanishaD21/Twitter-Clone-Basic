@@ -1,0 +1,46 @@
+.home-header {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-bottom: 30px;
+    gap:200px;
+}
+
+.search-form {
+    display: flex;
+    gap: 10px;
+}
+
+.search-form input {
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    border: 1px solid #ccc;
+
+    width: 220px;
+
+    outline: none;
+}
+
+.search-form button {
+    padding: 10px 16px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background-color: #38bdf8;
+
+    color: white;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+.search-form button:hover {
+    background-color: #0ea5e9;
+}

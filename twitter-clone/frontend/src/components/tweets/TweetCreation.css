@@ -1,0 +1,54 @@
+.tweet-creation {
+  margin-bottom: 24px;
+  padding: 20px;
+  border-radius: 24px;
+  border: 1px solid var(--card-border);
+  background: linear-gradient(180deg, rgba(17, 24, 39, 0.9), rgba(15, 23, 42, 0.85));
+  box-shadow: var(--shadow);
+}
+
+.tweet-creation h2 {
+  margin: 0 0 16px;
+  font-size: 1.35rem;
+  color: #ffffff;
+}
+
+.tweet-creation textarea {
+  width: 100%;
+  min-height: 130px;
+  resize: vertical;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.tweet-creation textarea:focus {
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12);
+}
+
+.tweet-creation .tweet-creation-actions {
+  margin-top: 14px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.tweet-creation button {
+  border: none;
+  border-radius: 14px;
+  padding: 11px 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  color: white;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.tweet-creation button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}

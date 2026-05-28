@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { registerUser } from "../api/authApi";
+// import "./RegisterPage.css";
 
 function RegisterPage() {
     const [formData, setFormData] = useState({
@@ -50,10 +51,18 @@ function RegisterPage() {
             password,
         });
 
-        const { token } = response.data;
+        const { token,user } = response.data;
 
         if (token) {
             localStorage.setItem("token", token);
+            localStorage.setItem(
+                "user",
+                JSON.stringify({
+                    id: user.id,
+                    username: user.username,
+                    name: user.name
+                })
+            );
         }
 
         navigate("/");
