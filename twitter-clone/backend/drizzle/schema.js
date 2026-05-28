@@ -81,13 +81,17 @@ const comments=pgTable("comments",{
 //NOTIFICATIONS TABLE
 const notifications= pgTable("notifications", {
     id: serial("id").primaryKey(), // Primary key with auto-incrementing ID
-    recipientId: integer("recipient_id").notNull(), // Foreign key referencing the user who receives the notification
-    senderId: integer("sender_id").notNull(), // Foreign key referencing the user who triggered the notification
+    recipientId: integer("recipient_id").references(()=>users.id,{onDelete:"cascade"}).notNull(), // Foreign key referencing the user who receives the notification
+    senderId: integer("sender_id").references(()=>users.id,{onDelete:"cascade"}).notNull(), // Foreign key referencing the user who triggered the notification
     type: varchar("type", { length: 50 }).notNull(), // Type of notification (e.g., "like", "follow", "mention")
-    tweetId: integer("tweet_id"),// Foreign key referencing the related tweet (if applicable)
-    isRead: boolean("is_read").default(false),
-    createdAt: timestamp("create_at").defaultNow().notNull() // Timestamp for when the notification was created
-})
+    tweetId: integer("tweet_id").references(()=>tweets.id,{onDelete:"cascade"}),// Foreign key referencing the related tweet (if applicable)
+    isRead: boolean("is_read").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull() // Timestamp for when the notification was created
+}, (table) => ({
+    recipientIdx: index("notifications_recipient_id_idx").on(table.recipientId),
+    readIdx: index("notifications_is_read_idx").on(table.isRead),
+    createdAtIdx: index("notifications_created_at_idx").on(table.createdAt),
+}))
 
 module.exports={
     users,tweets,follows,comments,likes,notifications
