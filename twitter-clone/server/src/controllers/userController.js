@@ -1,4 +1,4 @@
-const { eq, and, sql } = require('drizzle-orm');
+const { eq, and, sql, desc } = require('drizzle-orm');
 const db = require('../db');
 const { users, follows } = require('../db/schema');
 
@@ -275,15 +275,23 @@ const unfollowUser = async (req,res) => {
 const getFollowers = async (req,res) => {
     try {
         const userId = req.user?.id;
-        if(!userId){
-            return res.status(401).json({ message: "You are not authenticated" });
+        const id=req.query.id;
+        if(!userId)
+        {
+            return res.status(403).json({message:"User not authenticated"});
         }
-        const followers = await db
-            .select({ id: follows.id, followerId: follows.followerId, name: users.name, username: users.username, profileImage: users.profileImage })
-            .from(follows)
-            .innerJoin(users, eq(follows.followerId, users.id))
-            .where(eq(follows.followingId, userId));
-
+        let followers;
+        if(!id)
+        {
+            followers=await db
+                .select({username:users.username,userId:users.id,name:users.name,followingId:follows.followingId}).from(follows)
+                .where(eq(follows.followingId, userId)).innerJoin(users,eq(follows.followerId,users.id)).orderBy(desc(follows.createdAt));
+        }
+        else{
+            followers=await db
+            .select({username:users.username,userId:users.id,name:users.name,followingId:follows.followingId}).from(follows)
+            .where(eq(follows.followingId, id)).innerJoin(users,eq(follows.followerId,users.id)).orderBy(desc(follows.createdAt));
+        }
         res.status(200).json({ followers });
     }catch(error){
         console.error("error following the user:", error);
@@ -299,15 +307,19 @@ const getFollowers = async (req,res) => {
 // Get the list of users that a user is following by querying the follows table for users that the specified user is following
 const getFollowing = async (req,res) => {
     try {
-
-        const  userId = req.user?.id;
-
+ 
+        const  userId = req.user.id;
+        const id=req.query.id;
+        if(!userId)
+        {
+            return res.status(403).json({message:"User not authenticated"});
+        }
+        const finalId=id?Number(id):userId;
+       
         const following = await db
-            .select({ id: follows.id, followingId: follows.followingId, name: users.name, username: users.username, profileImage: users.profileImage })
-            .from(follows)
-            .innerJoin(users, eq(follows.followingId, users.id))
-            .where(eq(follows.followerId, userId));
-
+            .select({username:users.username,userId:users.id,name:users.name,followerId:follows.followerId}).from(follows)
+            .where(eq(follows.followerId, finalId)).innerJoin(users,eq(follows.followingId,users.id)).orderBy(desc(follows.createdAt));
+ 
         res.status(200).json({ following });
     }catch(error){
         console.error("error following the user:", error);
@@ -316,7 +328,67 @@ const getFollowing = async (req,res) => {
 };
 
 
-
+const viewOtherProfiles=async(req,res)=>{
+    try{
+        const userId=req.user?.id;
+        const username=req.body.username;
+        if(!userId)
+        {
+            return res.status(403).json({message:"User not authenticated"});
+        }
+        if(!username)
+        {
+            return res.status(404).json({message:"Username not found"});
+        }
+        const userid=await db.select({id:users.id}).from(users).where(eq(users.username,username));
+        if(userid.length==0)
+        {
+            return res.status(404).json({message:"Username not found"});
+        }
+        const existingFollow = await db
+            .select()
+            .from(follows)
+            .where(
+                and(
+                    eq(follows.followerId, userId),
+                    eq(follows.followingId, userid[0].id)
+                )
+            );
+        const profile=await db.select({
+            id: users.id,
+            name: users.name,
+            username: users.username,
+            email: users.email,
+            bio: users.bio,
+            profileImage: users.profileImage,
+            createdAt: users.createdAt,
+            followersCount: sql`(
+                SELECT COUNT(*)
+                FROM follows
+                WHERE follows.following_id = ${userid[0].id}
+            )`,
+ 
+            followingCount: sql`(
+                SELECT COUNT(*)
+                FROM follows
+                WHERE follows.follower_id = ${userid[0].id}
+            )`,
+            isFollowing: sql`${existingFollow.length > 0}`
+ 
+        }).from(users).where(eq(users.username,username));
+ 
+        if(profile.length==0)
+        {
+            return res.status(404).json({message:"Not such profile is found"});
+        }
+        return res.status(200).json({message:"User profile found",profile:profile[0]});
+    }
+    catch(error)
+    {
+        console.log("Error",error);
+        res.status(500).json({message:"Internal Server Error"});
+    }
+}
 
 
 
@@ -327,5 +399,6 @@ module.exports = {
     unfollowUser,
     getFollowers,
     getFollowing,
-    getFollowingProfile
+    getFollowingProfile,
+    viewOtherProfiles
 };

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/authService';
 import './signUpPage.css';
 
 function SignUp() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         username: '',
@@ -26,6 +27,7 @@ function SignUp() {
             const response = await registerUser({ name, username, email, password });
             console.log(response);
             alert("User registered successfully");
+            navigate('/');
         }catch(error){
             console.log(error);
             alert("Registration failed");

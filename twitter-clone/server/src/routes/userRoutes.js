@@ -7,6 +7,7 @@ const {
     unfollowUser,
     getFollowers,
     getFollowing,
+    viewOtherProfiles,
     getFollowingProfile
 } = require('../controllers/userController');
 
@@ -24,6 +25,8 @@ router.delete('/unfollow/:id', authMiddleware, unfollowUser);
 router.get('/followers', authMiddleware, getFollowers);
 
 router.get('/following', authMiddleware, getFollowing);
+
+router.get('/view',authMiddleware, viewOtherProfiles)
 
 router.get('/', authMiddleware, getUserProfile);
 
