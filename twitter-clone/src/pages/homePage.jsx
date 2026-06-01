@@ -3,9 +3,11 @@ import api from "../services/api";
 
 import { useEffect } from 'react';
 
+
 import './homePage.css';
 
 function Home(props) {
+
     useEffect(() =>{
         const testbackend = async () => {
             try{
@@ -17,6 +19,7 @@ function Home(props) {
         };
         testbackend();
     },[]);
+
 
     return (
 

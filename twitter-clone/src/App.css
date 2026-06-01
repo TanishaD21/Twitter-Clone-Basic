@@ -1,11 +1,20 @@
-.App {
-  display: flex;
-  min-height: 100vh;
-  background-color: #000000;
+.App{
+    display:flex;
+    justify-content:center;
+    min-height:100vh;
+    background:#000;
 }
 
-.main-content {
-  margin-left: 260px;
-  flex: 1;
-  background-color: #000000;
+.layout-container{
+    display:flex;
+}
+
+.main-content{
+    width:600px;
+    min-height:100vh;
+}
+
+.right-sidebar{
+    width:350px;
+    min-height:100vh;
 }

@@ -26,7 +26,7 @@ router.get('/followers', authMiddleware, getFollowers);
 
 router.get('/following', authMiddleware, getFollowing);
 
-router.get('/view',authMiddleware, viewOtherProfiles)
+router.post('/view',authMiddleware, viewOtherProfiles)
 
 router.get('/', authMiddleware, getUserProfile);
 

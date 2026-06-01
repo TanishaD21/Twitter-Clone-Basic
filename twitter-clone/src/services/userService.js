@@ -9,7 +9,7 @@ export const getUserProfile = async() => {
 };
 
 export const updateUserProfile = async(data) => {
-    const response = api.patch(
+    const response = await api.put(
         "/api/users/edit",
         data
     );
@@ -18,26 +18,31 @@ export const updateUserProfile = async(data) => {
 };
 
 
-export const getOtherProfile=(username)=>{
-    return api.post(`/api/user/view`,{username});
+export const getOtherProfile=async(username)=>{
+    const response = await api.post(`/api/users/view`,{username});
+    return response.data;
 }
 
-export const followUserProfile=(id)=>{
-    return api.post(`/api/user/follow/${id}`);
+export const followUserProfile=async (id)=>{
+    const response = await api.post(`/api/users/follow/${id}`);
+    return response.data;
 }
 
-export const unfollowUserProfile=(id)=>{
-    return api.delete(`/api/user/unfollow/${id}`);
+export const unfollowUserProfile=async(id)=>{
+    const response = await api.delete(`/api/users/unfollow/${id}`);
+    return response.data;
 }
 
-export const getFollowersForUser=(id)=>{
-    return api.get(`api/user/followers`,{
+export const getFollowersForUser=async(id)=>{
+    const response=  await api.get(`api/users/followers`,{
         params: id ? {id} : {}
     })
+    return response.data;
 }
 
-export const getFollowingForUser=(id)=>{
-    return api.get(`api/user/following`,{
+export const getFollowingForUser=async(id)=>{
+    const response = await api.get(`api/users/following`,{
         params: id ? {id} : {}
     })
+    return response.data;
 }

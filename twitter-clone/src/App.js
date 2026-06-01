@@ -8,6 +8,7 @@ import Post from './pages/postPage';
 import Login from './pages/loginPage';
 import SignUp from './pages/signUpPage';
 import ProfilePage from './pages/profilePage';
+import RightSidebar from './components/rightSidebar';
 
 import { getAllTweets,getFollowingTweets, createTweet, deleteTweet } from './services/tweetService';
 
@@ -93,7 +94,7 @@ function App() {
     <BrowserRouter>
 
       <div className="App">
-
+        <div className="layout-container">
         <Navbar />
 
         <div className="main-content">
@@ -126,6 +127,16 @@ function App() {
             />
 
             <Route
+              path="/profile/:username"
+              element={
+                <ProtectedRoutes>
+                  <ProfilePage  />
+                </ProtectedRoutes>
+              }
+            />
+  
+
+            <Route
               path="/login"
               element={<Login />}
             />
@@ -139,6 +150,8 @@ function App() {
 
         </div>
 
+        <RightSidebar/>
+        </div>
       </div>
 
     </BrowserRouter>

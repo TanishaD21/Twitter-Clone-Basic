@@ -2,7 +2,7 @@ import { useState } from "react";
 import { updateUserProfile } from "../services/userService";
 import "./editProfile.css";
 
-const EditProfilePage = ({ user, setUser, setProfiles, refreshProfile, onClose }) => {
+const EditProfilePage = ({ user, setProfile, onClose }) => {
     const [formData, setFormData] = useState({
         username: user?.username || "",
         name: user?.name || "",
@@ -27,28 +27,24 @@ const EditProfilePage = ({ user, setUser, setProfiles, refreshProfile, onClose }
         setError("");
  
         const response = await updateUserProfile(formData);
-        const updatedUser = response?.data?.user;
+        const updatedUser = response?.user;
  
         if (!updatedUser) {
             throw new Error("Updated user data not found in response");
         }
  
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        setUser(updatedUser);
  
-        if (setProfiles) {
-            setProfiles(updatedUser);
+        if (setProfile) {
+            setProfile(updatedUser);
         }
  
-        if (refreshProfile) {
-            await refreshProfile();
-        }
  
         onClose();
         } catch (error) {
         console.error(error);
         setError(
-            error.response?.data?.message || error.message || "Failed to update profile"
+            error.response?.message || error.message || "Failed to update profile"
         );
         } finally {
         setLoading(false);

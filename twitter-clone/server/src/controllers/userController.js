@@ -307,7 +307,7 @@ const getFollowers = async (req,res) => {
 // Get the list of users that a user is following by querying the follows table for users that the specified user is following
 const getFollowing = async (req,res) => {
     try {
- 
+
         const  userId = req.user.id;
         const id=req.query.id;
         if(!userId)
@@ -315,11 +315,11 @@ const getFollowing = async (req,res) => {
             return res.status(403).json({message:"User not authenticated"});
         }
         const finalId=id?Number(id):userId;
-       
+
         const following = await db
             .select({username:users.username,userId:users.id,name:users.name,followerId:follows.followerId}).from(follows)
             .where(eq(follows.followerId, finalId)).innerJoin(users,eq(follows.followingId,users.id)).orderBy(desc(follows.createdAt));
- 
+
         res.status(200).json({ following });
     }catch(error){
         console.error("error following the user:", error);
@@ -341,7 +341,7 @@ const viewOtherProfiles=async(req,res)=>{
             return res.status(404).json({message:"Username not found"});
         }
         const userid=await db.select({id:users.id}).from(users).where(eq(users.username,username));
-        if(userid.length==0)
+        if(userid.length===0)
         {
             return res.status(404).json({message:"Username not found"});
         }
@@ -377,7 +377,7 @@ const viewOtherProfiles=async(req,res)=>{
  
         }).from(users).where(eq(users.username,username));
  
-        if(profile.length==0)
+        if(profile.length===0)
         {
             return res.status(404).json({message:"Not such profile is found"});
         }
