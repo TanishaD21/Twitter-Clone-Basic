@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import PostCard from "../components/postCard";
@@ -45,7 +45,7 @@ function ProfilePage(){
 
     const { username } = useParams();
 
-    const fetchProfile = async() => {
+    const fetchProfile = useCallback(async() => {
 
         try{
 
@@ -92,7 +92,7 @@ function ProfilePage(){
         finally{
             setLoading(false);
         }
-    };
+    },[username]);
 
     const handleDelete = async(tweetId) => {
 
@@ -222,7 +222,7 @@ function ProfilePage(){
 
         fetchProfile();
 
-    },[username]);
+    },[fetchProfile]);
 
     return(
 
