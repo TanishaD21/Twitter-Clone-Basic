@@ -1,6 +1,12 @@
 const db=require("../config/db.js");
 const {notifications}=require("../drizzle/schema.js");
-
+const validTypes = [
+            "FOLLOW",
+            "LIKE",
+            "COMMENT",
+            "MENTION",
+            "TEST"
+        ];
 
 const createNotification = async ({
     recipientId,
@@ -12,7 +18,9 @@ const createNotification = async ({
         if(recipientId === senderId){
             return;
         }
-
+        if(!validTypes.includes(type)){
+            return;
+        }
         await db.insert(notifications).values({
             recipientId,
             senderId,

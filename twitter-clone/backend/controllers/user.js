@@ -197,7 +197,12 @@ const followUser = async (req,res) => {
                 followerId: followerId,
                 followingId: followingId
             });
-        
+            
+        await createNotification({
+            recipientId: followingId,
+            senderId: followerId,
+            type: "FOLLOW",
+        });
         res.status(200).json(
             {message: "user followed!"}
         );

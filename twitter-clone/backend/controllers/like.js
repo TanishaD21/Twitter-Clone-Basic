@@ -16,6 +16,7 @@ async function like(req,res)
             return res.status(400).json({message:"Tweet id not found"});
         }
         const tweet=await db.select().from(tweets).where(eq(tweets.id,tweetId));
+        const tweetOwnerId=tweet[0].userId;
         if(tweet.length==0)
         {
             return res.status(404).json({message:"Tweet not found"});
@@ -31,6 +32,12 @@ async function like(req,res)
             return res.status(200).json({message:"You have already liked the tweet"});
         }
         const newLike=await db.insert(likes).values({tweet_id:tweetId,user_id:userId}).returning();
+        await createNotification({
+            recipientId: tweetOwnerId,
+            senderId: req.user.id,
+            type: "LIKE",
+            tweetId,
+        });
         return res.status(200).json({message:"Added like successfully",like:newLike[0]});
     }
     catch(error)

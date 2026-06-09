@@ -20,6 +20,7 @@ const getNotifications = async(req,res) => {
                 senderId: users.id,
                 senderName: users.name,
                 senderUsername: users.username,
+                senderProfileImage: users.profileImage,
                 tweetId: notifications.tweetId
             })
             .from(notifications)
@@ -45,11 +46,14 @@ const markNotificationAsRead = async(req,res) => {
             return res.status(400).json({ message: "Invalid notification ID" });
         }
         // Update the notification with the specified ID to mark it as read by setting the isRead field to true
-        await db.update(notifications)
+        const updated= await db.update(notifications)
         .set({isRead: true})
         .where(and(eq(notifications.id, id),eq(notifications.recipientId,userId)))
         .returning();
-
+        if(updated.length===0)
+        {
+            return res.status(404).json({message:"Notification not found"});
+        }
         res.status(200).json({ success: true, message: "Notification marked as read"});
     }catch(error){
         console.log("Error marking notification as read", error);
