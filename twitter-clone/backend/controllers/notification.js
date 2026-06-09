@@ -11,10 +11,23 @@ const getNotifications = async(req,res) => {
             return res.status(401).json({message: " you are not authenticated"});
         }
         // Fetch notifications for the authenticated user, ordered by creation date in descending order
-        const data = await db.select()
-        .from(notifications)
-        .where(eq(notifications.recipientId, userId))
-        .orderBy(desc(notifications.createdAt));
+        const data = await db
+            .select({
+                id: notifications.id,
+                type: notifications.type,
+                isRead: notifications.isRead,
+                createdAt: notifications.createdAt,
+                senderId: users.id,
+                senderName: users.name,
+                senderUsername: users.username,
+                tweetId: notifications.tweetId
+            })
+            .from(notifications)
+            .innerJoin(users,
+                eq(notifications.senderId, users.id)
+            )
+            .where(eq(notifications.recipientId, userId))
+            .orderBy(desc(notifications.createdAt));
 
         res.status(200).json({ success: true, notifications: data });
     }catch(error){
@@ -26,6 +39,7 @@ const getNotifications = async(req,res) => {
 
 const markNotificationAsRead = async(req,res) => {
     try{
+        const userId=req.user?.id;
         const id = Number(req.params.id);
         if(!id){
             return res.status(400).json({ message: "Invalid notification ID" });
@@ -33,7 +47,7 @@ const markNotificationAsRead = async(req,res) => {
         // Update the notification with the specified ID to mark it as read by setting the isRead field to true
         await db.update(notifications)
         .set({isRead: true})
-        .where(eq(notifications.id, id))
+        .where(and(eq(notifications.id, id),eq(notifications.recipientId,userId)))
         .returning();
 
         res.status(200).json({ success: true, message: "Notification marked as read"});
@@ -43,33 +57,7 @@ const markNotificationAsRead = async(req,res) => {
     }
 };
 
-
-const createNotification = async ({
-    recipientId,
-    senderId,
-    type,
-    tweetId = null
-}) => {
-    try {
-
-        if(recipientId === senderId){
-            return;
-        }
-
-        await db.insert(notifications).values({
-            recipientId,
-            senderId,
-            type,
-            tweetId,
-        });
-
-    } catch(error){
-        console.log("Notification Error", error);
-    }
-};
-
 module.exports = {
     getNotifications,
-    markNotificationAsRead,
-    createNotification
+    markNotificationAsRead
 }
