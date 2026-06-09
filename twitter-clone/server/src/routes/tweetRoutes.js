@@ -5,7 +5,8 @@ const {
     deleteTweet,
     viewOurTweets,
     updateTweet,
-    viewAllTweets}=require("../controllers/tweetController.js");
+    viewAllTweets,
+    viewFollowingTweets}=require("../controllers/tweetController.js");
 
 const authMiddleware=require("../middleware/authMiddleware.js");
 
@@ -23,7 +24,12 @@ router.patch('/:id',authMiddleware,updateTweet);
 // Get our tweets route
 router.get('/view',authMiddleware,viewOurTweets);
 
+//Get following tweets route
+router.get('/following',authMiddleware,viewFollowingTweets);
+
 // Get all tweets route
 router.get('/',authMiddleware,viewAllTweets);
+
+
 
 module.exports=router;

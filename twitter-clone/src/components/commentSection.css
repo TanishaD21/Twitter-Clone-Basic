@@ -1,19 +1,47 @@
 .comment-section {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid #ddd;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 1px solid #2f3336;
 }
 
 .comment-section-title {
-    font-size: 18px;
-    margin-bottom: 10px;
-    color: #f1f1f1;
+    font-size: 15px;
+    font-weight: 700;
+    color: #e7e9ea;
+    padding: 12px 16px 8px;
+    margin: 0;
 }
 
 .comment-section-comment {
-  background-color: #f1f1f1;
-  color: black;
-  padding: 8px;
-  border-radius: 5px;
-  margin-top: 8px;
+    display: flex;
+    gap: 12px;
+    padding: 12px 16px;
+    border-top: 1px solid #2f3336;
+    transition: background-color 0.2s;
+}
+
+.comment-section-comment:hover {
+    background-color: rgba(231, 233, 234, 0.03);
+}
+
+.comment-section-comment p {
+    color: #e7e9ea;
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.comment-section-comment strong {
+    color: #e7e9ea;
+    font-weight: 700;
+    font-size: 15px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.comment-section-comment strong + span,
+.comment-section-comment .comment-username {
+    color: #71767b;
+    font-size: 15px;
+    font-weight: 400;
 }

@@ -1,0 +1,45 @@
+.edit-profile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+ 
+.edit-profile-modal {
+    background: #000000;
+    color: #e7e9ea;
+    border: 1px solid #2f3336;
+    width: 400px;
+    max-width: 90%;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+ 
+.edit-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+ 
+.edit-profile-form input,
+.edit-profile-form textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+ 
+.edit-profile-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 8px;
+}

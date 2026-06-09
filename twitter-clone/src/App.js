@@ -7,8 +7,10 @@ import Home from './pages/homePage';
 import Post from './pages/postPage';
 import Login from './pages/loginPage';
 import SignUp from './pages/signUpPage';
+import ProfilePage from './pages/profilePage';
+import RightSidebar from './components/rightSidebar';
 
-import { getAllTweets, createTweet } from './services/tweetService';
+import { getAllTweets,getFollowingTweets, createTweet, deleteTweet } from './services/tweetService';
 
 import ProtectedRoutes from './components/protectedRoutes';
 
@@ -16,21 +18,38 @@ import ProtectedRoutes from './components/protectedRoutes';
 // Main App component that sets up routing and manages posts state
 function App() {
   const [posts, setPosts] = useState([]);
+  const [activeTab, setActiveTab] = useState("forYou");
 
   useEffect(() => {
-    const fetchTweets = async() => {
-          try{
-            const data = await getAllTweets();
-            console.log(data);
-            setPosts(data.AllTweets);
-          }catch(error){
-            console.log(error)
+
+      const fetchTweets = async() => {
+
+        try {
+
+          let data;
+
+          if(activeTab === "forYou") {
+
+            data = await getAllTweets();
+            setPosts(data.tweets);
+
           }
-    };
 
-    fetchTweets();
+          else {
 
-  },[]);
+            data = await getFollowingTweets();
+            setPosts(data.tweets);
+
+          }
+
+        } catch(error) {
+          console.log(error);
+        }
+      };
+
+      fetchTweets();
+
+  }, [activeTab]);
 
   const handleNewPost = async(text) => {
     try{
@@ -41,9 +60,30 @@ function App() {
       console.log(response);
 
       
-      const updatedTweets = await getAllTweets();
+      let updatedTweets;
 
-      setPosts(updatedTweets.AllTweets);
+      if(activeTab === "forYou") {
+          updatedTweets = await getAllTweets();
+          setPosts(updatedTweets.tweets);
+      }
+      else {
+          updatedTweets = await getFollowingTweets();
+          setPosts(updatedTweets.tweets);
+      }
+
+    }catch(error){
+      console.log(error);
+    }
+  };
+
+  const handleDeletePost = async(tweetId) => {
+    try{
+      await deleteTweet(tweetId);
+      setPosts((prevPosts) => 
+        prevPosts.filter(
+          (post) => post.id !== tweetId
+        )
+      );
 
     }catch(error){
       console.log(error);
@@ -54,7 +94,7 @@ function App() {
     <BrowserRouter>
 
       <div className="App">
-
+        <div className="layout-container">
         <Navbar />
 
         <div className="main-content">
@@ -65,7 +105,7 @@ function App() {
               path="/"
               element={
                 <ProtectedRoutes>
-                  <Home posts={posts} />
+                  <Home posts={posts} onDelete={handleDeletePost} activeTab={activeTab} setActiveTab={setActiveTab} />
                 </ProtectedRoutes>}
             />
 
@@ -76,6 +116,25 @@ function App() {
                   <Post addPost={handleNewPost} />
                 </ProtectedRoutes>}
             />
+
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoutes>
+                  <ProfilePage />
+                </ProtectedRoutes>
+              }
+            />
+
+            <Route
+              path="/profile/:username"
+              element={
+                <ProtectedRoutes>
+                  <ProfilePage  />
+                </ProtectedRoutes>
+              }
+            />
+  
 
             <Route
               path="/login"
@@ -91,6 +150,8 @@ function App() {
 
         </div>
 
+        <RightSidebar/>
+        </div>
       </div>
 
     </BrowserRouter>
