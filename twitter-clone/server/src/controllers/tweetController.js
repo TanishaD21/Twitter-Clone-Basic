@@ -43,6 +43,7 @@ async function deleteTweet(req,res)
         {
             return res.status(401).json({message:"User not authenticated"})
         }
+        //Check if the tweet with the given id exists in the database. If it does not exist, return a 404 Not Found response indicating that the tweet was not found.
         const existingTweet=await db.select().from(tweets).where(eq(tweets.id,id));
         if(existingTweet.length===0)
         {
@@ -69,7 +70,7 @@ async function viewOurTweets(req, res) {
     if (!userId) {
         return res.status(401).json({ message: "User not authenticated" });
     }
- 
+    // Fetch all tweets posted by the authenticated user from the database, ordered by creation date in descending order (newest first)
     const viewTweets = await db
         .select({
             id: tweets.id,
@@ -84,7 +85,7 @@ async function viewOurTweets(req, res) {
     if (viewTweets.length === 0) {
         return res.status(200).json({ tweets: viewTweets});
     }
- 
+    // Extract the tweet IDs from the fetched tweets to use in subsequent queries for likes and comments related to these tweets.
     const ids = viewTweets.map((tweet) => tweet.id);
  
     const tweetLikes = await db

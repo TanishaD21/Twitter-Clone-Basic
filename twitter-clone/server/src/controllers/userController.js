@@ -50,7 +50,7 @@ const getUserProfile = async (req, res) => {
     }
 };
 
-
+// Get another user's profile by ID, including follower and following counts, and whether the current user follows them
 const getFollowingProfile = async (req, res) => {
 
     try {
@@ -204,7 +204,7 @@ const followUser = async (req,res) => {
         if(followerId === followingId){
             return res.status(400).json({ message: " you cannot follow yourself" });
         }
-
+        // Check if the follow relationship already exists in the database to prevent duplicate follows. If a record is found, return a 400 Bad Request response indicating that the user is already following the specified user. If no record is found, proceed to create a new follow relationship in the database.
         const existingFollow = await db.select().from(follows).where(
             and(
                 eq(follows.followerId, followerId),
@@ -327,7 +327,7 @@ const getFollowing = async (req,res) => {
     }
 };
 
-
+// View another user's profile by their username, including follower and following counts, and whether the current user follows them
 const viewOtherProfiles=async(req,res)=>{
     try{
         const userId=req.user?.id;
@@ -345,6 +345,7 @@ const viewOtherProfiles=async(req,res)=>{
         {
             return res.status(404).json({message:"Username not found"});
         }
+        // Check if current user follows this profile
         const existingFollow = await db
             .select()
             .from(follows)
@@ -354,6 +355,7 @@ const viewOtherProfiles=async(req,res)=>{
                     eq(follows.followingId, userid[0].id)
                 )
             );
+            // Fetch the user profile from the database, including follower and following counts, and whether the current user follows them
         const profile=await db.select({
             id: users.id,
             name: users.name,
