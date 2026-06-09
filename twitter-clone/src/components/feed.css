@@ -1,5 +1,54 @@
 .feed {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.feed-header {
+    position: sticky;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(12px);
+    padding: 14px 16px;
+    border-bottom: 1px solid #2f3336;
+    z-index: 10;
+}
+
+.feed-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e7e9ea;
+    margin: 0;
+}
+
+.feed-tab-bar {
+    display: flex;
+    border-bottom: 1px solid #2f3336;
+}
+
+.feed-tab {
+    flex: 1;
+    padding: 16px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: #71767b;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s, background-color 0.2s;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+}
+
+.feed-tab:hover {
+    background-color: rgba(231, 233, 234, 0.03);
+    color: #e7e9ea;
+}
+
+.feed-tab.active {
+    color: #e7e9ea;
+    border-bottom: 2px solid #1d9bf0;
+    font-weight: 700;
 }

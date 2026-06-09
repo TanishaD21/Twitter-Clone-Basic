@@ -4,7 +4,10 @@ import api from "../services/api";
 import { useEffect } from 'react';
 
 
+import './homePage.css';
+
 function Home(props) {
+
     useEffect(() =>{
         const testbackend = async () => {
             try{
@@ -17,12 +20,13 @@ function Home(props) {
         testbackend();
     },[]);
 
+
     return (
 
-        <div>
-
-            <Feed posts={props.posts} />
-
+        <div className="home-page">
+            <div className="home-content">
+                <Feed posts={props.posts} onDelete={props.onDelete} activeTab={props.activeTab} setActiveTab={props.setActiveTab}/>
+            </div>
         </div>
 
     );

@@ -58,8 +58,8 @@ const tweets = pgTable(
 //LIKES TABLE
 const likes=pgTable("likes",{
     id: serial("id").primaryKey(),
-    tweet_id: integer("tweet_id").references(()=>tweets.id,{onDelete:"cascade"}).notNull(),
-    user_id: integer("user_id").references(()=>users.id,{onDelete:"cascade"}).notNull(),
+    tweetId: integer("tweet_id").references(()=>tweets.id,{onDelete:"cascade"}).notNull(),
+    userId: integer("user_id").references(()=>users.id,{onDelete:"cascade"}).notNull(),
     createdAt:timestamp("created_at").defaultNow().notNull()
 });
 
@@ -93,8 +93,8 @@ const notifications= pgTable("notifications", {
 //COMMENT TABLE
 const comments=pgTable("comments",{
     id: serial("id").primaryKey(),
-    tweet_id: integer("tweet_id").references(()=>tweets.id,{onDelete:"cascade"}).notNull(),
-    user_id: integer("user_id").references(()=>users.id,{onDelete:"cascade"}).notNull(),
+    tweetId: integer("tweet_id").references(()=>tweets.id,{onDelete:"cascade"}).notNull(),
+    userId: integer("user_id").references(()=>users.id,{onDelete:"cascade"}).notNull(),
     content: text("content").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull()
